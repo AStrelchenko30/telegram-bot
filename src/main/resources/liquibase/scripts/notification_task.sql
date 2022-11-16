@@ -4,10 +4,10 @@
 
 CREATE TABLE notification_task
 (
-    id SERIAL primary key not null,
-        chatId BIGINT not null,
-        msg TEXT not null ,
-    time_massage timestamp not null
+
+    chat_Id      BIGINT primary key not null,
+    msg         TEXT               not null,
+    time_Message timestamptz          not null
 
 )
 

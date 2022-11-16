@@ -3,7 +3,6 @@ package pro.sky.telegrambot.model;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -22,24 +21,24 @@ public class NotificationTask {
 
     private String msg;
 
-    private LocalDateTime time_massage;
+    private LocalDateTime timeMessage;
 
-    public NotificationTask(Long chatId, String msg, LocalDateTime time_massage) {
+    public NotificationTask(Long chatId, String msg, LocalDateTime timeMessage) {
         this.chatId = chatId;
         this.msg = msg;
-        this.time_massage = time_massage;
+        this.timeMessage = timeMessage;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         NotificationTask that = (NotificationTask) o;
-        return chatId != null && Objects.equals(chatId, that.chatId);
+        return Objects.equals(chatId, that.chatId) && Objects.equals(msg, that.msg) && Objects.equals(timeMessage, that.timeMessage);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(chatId, msg, timeMessage);
     }
 }

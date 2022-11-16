@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.Repository.TelegramRepository;
@@ -24,11 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-
-@Component
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener {
-    @Autowired
     public TelegramRepository telegramRepository;
     @Autowired
     private TelegramBot telegramBot;
@@ -39,6 +35,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         this.telegramRepository = telegramRepository;
     }
 
+    Pattern pattern = Pattern.compile("([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)");
 
     @PostConstruct
     public void init() {
@@ -54,21 +51,20 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             Long chatId = update.message().chat().id();
             String textM = message.text();
 
-            Pattern pattern = Pattern.compile("([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)");
 
-            if ("/start".equals(message.text())) {
+            if ("/start".equals(textM)) {
                 SendMessage sendMessage = new SendMessage(chatId, "Hi,how are you?");
                 telegramBot.execute(sendMessage);
 
             }
 
-            Matcher matcher = pattern.matcher("01.01.2022 20:00Сделать домашнюю работу");
+            Matcher matcher = pattern.matcher("01.01.2022 20:00 Сделать домашнюю работу");
 
             if (matcher.matches()) {
                 String date = matcher.group(1);
                 String msg = matcher.group(3);
-                LocalDateTime time_massage = LocalDateTime.parse(matcher.group(), DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
-                NotificationTask notificationTask = new NotificationTask(chatId, msg, time_massage);
+                LocalDateTime timeMessage = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+                NotificationTask notificationTask = new NotificationTask(chatId, msg, timeMessage);
                 telegramRepository.save(notificationTask);
 
             }
@@ -79,10 +75,19 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     }
 
     @Scheduled(cron = "0 0/1 * * * *")
-    private void run() {
-        logger.info("Нотификация сейчас"+ LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
-
+    public void run() {
+        NotificationTask notificationTask = new NotificationTask();
+        if (telegramRepository.equals(notificationTask)) {
+            LocalDateTime localDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+            long id = notificationTask.getChatId();
+            if (localDateTime == notificationTask.getTimeMessage()) {
+                SendMessage sendMessage = new SendMessage(id, "Сообщение отправленно в текущую минуту");
+                telegramBot.execute(sendMessage);
+            }
+        }
     }
-
 }
+
+
+
 
