@@ -16,9 +16,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class NotificationTask {
     @Id
-    private Long id;
-    @GeneratedValue
 
+    @GeneratedValue
+    private Long id;
     private Long chatId;
 
     private String msg;
