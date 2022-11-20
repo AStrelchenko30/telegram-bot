@@ -16,7 +16,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class NotificationTask {
     @Id
+    private Long id;
     @GeneratedValue
+
     private Long chatId;
 
     private String msg;
@@ -34,11 +36,11 @@ public class NotificationTask {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotificationTask that = (NotificationTask) o;
-        return Objects.equals(chatId, that.chatId) && Objects.equals(msg, that.msg) && Objects.equals(timeMessage, that.timeMessage);
+        return Objects.equals(id, that.id) && Objects.equals(chatId, that.chatId) && Objects.equals(msg, that.msg) && Objects.equals(timeMessage, that.timeMessage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(chatId, msg, timeMessage);
+        return Objects.hash(id, chatId, msg, timeMessage);
     }
 }

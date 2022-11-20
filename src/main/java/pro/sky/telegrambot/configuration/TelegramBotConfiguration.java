@@ -12,7 +12,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 @EnableScheduling
 @Configuration
-@Data
 public class TelegramBotConfiguration {
 
     @Value("${telegram.bot.token}")

@@ -17,7 +17,6 @@ import pro.sky.telegrambot.Repository.TelegramRepository;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,12 +26,13 @@ import java.util.regex.Pattern;
 public class TelegramBotUpdatesListener implements UpdatesListener {
     public TelegramRepository telegramRepository;
     @Autowired
-    private TelegramBot telegramBot;
+    private final TelegramBot telegramBot;
 
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 
-    public TelegramBotUpdatesListener(TelegramRepository telegramRepository) {
+    public TelegramBotUpdatesListener(TelegramRepository telegramRepository, TelegramBot telegramBot) {
         this.telegramRepository = telegramRepository;
+        this.telegramBot = telegramBot;
     }
 
     Pattern pattern = Pattern.compile("([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)");
@@ -74,19 +74,17 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     }
 
+
     @Scheduled(cron = "0 0/1 * * * *")
     public void run() {
-        NotificationTask notificationTask = new NotificationTask();
-        if (telegramRepository.equals(notificationTask)) {
-            LocalDateTime localDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-            long id = notificationTask.getChatId();
-            if (localDateTime == notificationTask.getTimeMessage()) {
-                SendMessage sendMessage = new SendMessage(id, "Сообщение отправленно в текущую минуту");
-                telegramBot.execute(sendMessage);
-            }
+        List<NotificationTask> messageTime = telegramRepository.findByTimeMessage(LocalDateTime.now());
+        for (NotificationTask notificationTask : messageTime) {
+            SendMessage sendMessage = new SendMessage(notificationTask.getChatId(), notificationTask.getMsg());
+            telegramBot.execute(sendMessage);
         }
     }
 }
+
 
 
 
