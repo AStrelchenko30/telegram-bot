@@ -58,7 +58,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
             }
 
-            Matcher matcher = pattern.matcher("01.01.2022 20:00 Сделать домашнюю работу");
+            Matcher matcher = pattern.matcher(textM);
 
             if (matcher.matches()) {
                 String date = matcher.group(1);
@@ -69,7 +69,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
             }
         });
-        run();
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
 
 
